@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="ja">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="Content-Security-Policy" content="default-src 'self' 'unsafe-inline' 'unsafe-eval' data:;">
+    <title>Local File Viewer</title>
+    <link rel="stylesheet" href="style.css?v=3">
+    <!-- Google Fonts (Optional: keep or local) -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&family=JetBrains+Mono:wght@400&display=swap"
+        rel="stylesheet">
+
+    <!-- Local Libraries -->
+    <script src="libs/marked.min.js"></script>
+    <link rel="stylesheet" href="libs/github.min.css">
+    <script src="libs/highlight.min.js"></script>
+</head>
+
+<body>
+    <div class="app-container">
+        <aside class="sidebar">
+            <div class="sidebar-header" style="display: flex; justify-content: space-between; align-items: center;">
+                <h2>Explorer</h2>
+                <button id="theme-toggle"
+                    style="background:none; border:1px solid var(--border-color); color:var(--text-color); cursor:pointer; padding:4px 8px; border-radius:4px;">Draft/Light</button>
+            </div>
+            <ul id="file-list" class="file-list">
+                <!-- File items injected here -->
+            </ul>
+        </aside>
+        <main class="content-area">
+            <nav id="breadcrumbs"></nav>
+            <div id="preview" class="markdown-body">
+                <div class="empty-state">Select a file to preview</div>
+            </div>
+
+            <details id="debug-container"
+                style="margin-top: 40px; border-top: 1px solid var(--border-color); padding-top: 20px;">
+                <summary style="cursor: pointer; color: var(--text-color); font-weight: bold; margin-bottom: 10px;">
+                    Debug Log</summary>
+                <div id="debug-log"
+                    style="font-family: monospace; font-size: 0.8rem; color: #8b949e; max-height: 200px; overflow-y: auto;">
+                </div>
+            </details>
+        </main>
+
+        <aside class="toc-sidebar">
+            <div class="toc-header">
+                <h3>On this page</h3>
+            </div>
+            <nav id="toc-nav"></nav>
+        </aside>
+    </div>
+
+    <!-- App Logic -->
+    <script type="module" src="main.js"></script>
+</body>
+
+</html>

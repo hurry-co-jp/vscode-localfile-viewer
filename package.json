@@ -1,0 +1,84 @@
+{
+    "name": "vscode-localfile-viewer",
+    "displayName": "Local File Viewer",
+    "description": "View Markdown and local files with a rich viewer",
+    "version": "0.0.5",
+    "repository": {
+        "type": "git",
+        "url": "https://github.com/username/vscode-localfile-viewer"
+    },
+    "engines": {
+        "vscode": "^1.80.0"
+    },
+    "categories": [
+        "Other"
+    ],
+    "activationEvents": [
+        "onCommand:vscode-localfile-viewer.open"
+    ],
+    "main": "./out/extension.js",
+    "contributes": {
+        "configuration": {
+            "title": "Local File Viewer",
+            "properties": {
+                "localFileViewer.serverPort": {
+                    "type": "integer",
+                    "default": 8080,
+                    "description": "Port number for the embedded server. Set to 0 for random port."
+                },
+                "localFileViewer.defaultTheme": {
+                    "type": "string",
+                    "default": "system",
+                    "enum": [
+                        "light",
+                        "dark",
+                        "system"
+                    ],
+                    "description": "Default theme for the viewer."
+                },
+                "localFileViewer.autoOpenBrowser": {
+                    "type": "boolean",
+                    "default": false,
+                    "description": "Automatically open the viewer in the default browser on start."
+                },
+                "localFileViewer.allowedExtensions": {
+                    "type": "array",
+                    "default": [
+                        ".md",
+                        ".yaml",
+                        ".yml"
+                    ],
+                    "items": {
+                        "type": "string"
+                    },
+                    "description": "List of file extensions to show in the sidebar."
+                }
+            }
+        },
+        "commands": [
+            {
+                "command": "vscode-localfile-viewer.open",
+                "title": "Open Use Local File Viewer"
+            }
+        ],
+        "menus": {
+            "explorer/context": [
+                {
+                    "command": "vscode-localfile-viewer.open",
+                    "when": "explorerResourceIsFolder",
+                    "group": "navigation"
+                }
+            ]
+        }
+    },
+    "scripts": {
+        "vscode:prepublish": "npm run compile",
+        "compile": "tsc -p ./",
+        "watch": "tsc -watch -p ./"
+    },
+    "devDependencies": {
+        "@types/vscode": "^1.80.0",
+        "@types/node": "^16.11.7",
+        "typescript": "^5.1.3"
+    }
+}
