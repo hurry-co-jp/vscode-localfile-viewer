@@ -142,7 +142,10 @@ async function handleRequest(req: http.IncomingMessage, res: http.ServerResponse
         try {
             const files = await scanFiles(currentContentRoot);
             res.writeHead(200, { 'Content-Type': 'application/json' });
-            res.end(JSON.stringify(files));
+            res.end(JSON.stringify({
+                files: files,
+                rootName: path.basename(currentContentRoot)
+            }));
         } catch (e) {
             console.error(e);
             res.writeHead(500);

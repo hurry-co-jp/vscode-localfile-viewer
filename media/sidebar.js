@@ -6,7 +6,16 @@ export async function loadFileList(onFileClick) {
     try {
         const res = await fetch('/api/files');
         if (!res.ok) throw new Error("Failed to load file list");
-        const files = await res.json();
+
+        const data = await res.json();
+        // Handle both old array format (fallback) and new object format
+        const files = Array.isArray(data) ? data : data.files;
+        const rootName = data.rootName || "Explorer";
+
+        // Update Header
+        const headerEl = document.querySelector('.sidebar-header h2');
+        if (headerEl) headerEl.textContent = rootName;
+
         log(`Loaded ${files.length} files`);
         fileListEl.innerHTML = '';
         const treeRoot = buildFileTree(files);
