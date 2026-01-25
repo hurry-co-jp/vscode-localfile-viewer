@@ -7,20 +7,49 @@ let server: http.Server | null = null;
 let currentContentRoot: string = '';
 let mediaRoot: string = '';
 
-let allowedExtensions: string[] = ['.md', '.yaml', '.yml'];
+// Hardcoded safety excludes
+const excludePatterns: string[] = ['node_modules', '.git', '.DS_Store'];
+
+const DEFAULT_FILE_GROUPS: { [group: string]: string[] } = {
+    "markdown": [".md", ".markdown"],
+    "image": [".png", ".jpg", ".jpeg", ".gif", ".svg", ".webp", ".bmp", ".ico"],
+    "media": [".pdf", ".mp4", ".webm", ".ogg", ".mov", ".mp3", ".wav"],
+    "code": [".js", ".ts", ".html", ".css", ".json", ".yaml", ".yml", ".py", ".c", ".cpp", ".h", ".hpp", ".go", ".rs", ".java", ".php", ".rb", ".sh", ".bat", ".ps1", ".xml", ".properties", ".ini", ".conf", ".sql"]
+};
+
+let fileGroups: { [group: string]: string[] } = {};
+let enabledGroups: { [group: string]: boolean } = {};
 
 let lastRequestedPort: number = -1;
 let currentRunningPort: number = -1;
 
-export function startServer(contentPath: string, mediaPath: string, port: number, allowedExts: string[] = ['.md', '.yaml', '.yml']): Promise<number> {
+export function startServer(contentPath: string, mediaPath: string, port: number, groups: any = {}, enabled: any = {}): Promise<number> {
     return new Promise((resolve, reject) => {
+        // Merge user groups with defaults
+        const mergedGroups = { ...DEFAULT_FILE_GROUPS };
+        for (const key of Object.keys(groups)) {
+            if (mergedGroups[key]) {
+                if (Array.isArray(groups[key])) {
+                    // Add unique extensions
+                    const set = new Set([...mergedGroups[key], ...groups[key]]);
+                    mergedGroups[key] = Array.from(set);
+                }
+            } else {
+                mergedGroups[key] = groups[key];
+            }
+        }
+
         // Reuse existing server if:
         // 1. Server is running
         // 2. The requested port config hasn't changed (user didn't change settings)
+        // 3. We allow reuse even if groups changed, we just update global vars.
+
         if (server && lastRequestedPort === port && currentRunningPort > 0) {
             currentContentRoot = contentPath;
             mediaRoot = mediaPath;
-            allowedExtensions = allowedExts;
+            // excludePatterns is constant now
+            fileGroups = mergedGroups; // Use merged
+            enabledGroups = enabled;
             console.log(`Reusing server at http://localhost:${currentRunningPort}`);
             resolve(currentRunningPort);
             return;
@@ -34,8 +63,10 @@ export function startServer(contentPath: string, mediaPath: string, port: number
             const tempServer = http.createServer(handleRequest);
             let started = false;
 
-            // Set global extensions for scanning
-            allowedExtensions = allowedExts;
+            // Set global patterns
+            // excludePatterns is constant
+            fileGroups = mergedGroups; // Use merged
+            enabledGroups = enabled;
 
             tempServer.on('error', (err: any) => {
                 if (err.code === 'EADDRINUSE') {
@@ -178,32 +209,79 @@ function getMimeType(ext: string): string {
         '.svg': 'image/svg+xml',
         '.md': 'text/markdown',
         '.yml': 'text/yaml',
-        '.yaml': 'text/yaml'
+        '.yaml': 'text/yaml',
+        '.pdf': 'application/pdf',
+        '.mp4': 'video/mp4',
+        '.webm': 'video/webm',
+        '.ogg': 'video/ogg',
+        '.mov': 'video/quicktime',
+        '.mp3': 'audio/mpeg',
+        '.wav': 'audio/wav'
     };
     return map[ext] || 'text/plain';
 }
 
-async function scanFiles(dir: string, baseDir: string = dir): Promise<string[]> {
-    let results: string[] = [];
+interface FileEntry {
+    path: string;
+    type: string;
+}
+
+async function scanFiles(dir: string, baseDir: string = dir): Promise<FileEntry[]> {
+    let results: FileEntry[] = [];
     try {
         const list = fs.readdirSync(dir, { withFileTypes: true });
         for (const entry of list) {
             const fullPath = path.join(dir, entry.name);
+
+
+            // Check exclusion
+            if (isExcluded(entry.name)) continue;
+
             if (entry.isDirectory()) {
-                if (entry.name.startsWith('.') || entry.name === 'node_modules') continue;
                 results = results.concat(await scanFiles(fullPath, baseDir));
             } else {
-                if (entry.name.startsWith('.')) continue;
-                const ext = path.extname(entry.name).toLowerCase();
-                if (allowedExtensions.includes(ext)) {
-                    let rel = path.relative(baseDir, fullPath);
-                    rel = rel.replace(/\\/g, '/');
-                    results.push(rel);
+                // Check if file is in an enabled group
+                const group = getFileGroup(entry.name);
+                if (group && enabledGroups[group]) {
+                    // It is a file
+                    let rel = path.relative(baseDir, fullPath).replace(/\\/g, '/');
+                    results.push({
+                        path: rel,
+                        type: group // 'code', 'image', 'markdown', etc.
+                    });
                 }
             }
         }
     } catch (e) {
         console.error('Scan error:', e);
     }
-    return results.sort();
+    return results.sort((a, b) => a.path.localeCompare(b.path));
+}
+
+function getFileGroup(filename: string): string | null {
+    const ext = path.extname(filename).toLowerCase();
+    for (const [group, extensions] of Object.entries(fileGroups)) {
+        // extensions might be array of strings
+        if (Array.isArray(extensions) && extensions.includes(ext)) {
+            return group;
+        }
+    }
+    return null;
+}
+
+function isExcluded(filename: string): boolean {
+    // Simple glob matching support: *
+    // We check against excludePatterns
+    for (const pattern of excludePatterns) {
+        if (simpleMatch(filename, pattern)) return true;
+    }
+    return false;
+}
+
+function simpleMatch(filename: string, pattern: string): boolean {
+    // Convert glob to regex
+    // Escape special regex chars except *
+    const regexStr = '^' + pattern.replace(/[.+?^${}()|[\]\\]/g, '\\$&').replace(/\*/g, '.*') + '$';
+    const regex = new RegExp(regexStr);
+    return regex.test(filename);
 }

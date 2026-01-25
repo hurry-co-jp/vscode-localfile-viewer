@@ -1,0 +1,23 @@
+Third Party Notices
+
+This project includes the following third-party software:
+
+1. marked
+   License: MIT
+   Copyright (c) 2011-2018, Christopher Jeffrey.
+
+2. highlight.js
+   License: BSD-3-Clause
+   Copyright (c) 2006, Ivan Sagalaev.
+
+3. mermaid
+   License: MIT
+   Copyright (c) 2014-2024 Knut Sveidqvist
+
+4. @marp-team/marp-core
+   License: MIT
+   Copyright (c) 2018-present Marp team
+
+5. github-markdown-css
+   License: MIT
+   Copyright (c) Sindre Sorhus <sindresorhus@gmail.com> (https://sindresorhus.com)

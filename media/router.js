@@ -6,7 +6,7 @@ import { updateBreadcrumbs } from './breadcrumbs.js';
 let currentFilePath = '';
 const previewEl = document.getElementById('preview');
 
-export async function loadFile(filename, clickedEl = null, updateHistory = true) {
+export async function loadFile(filename, clickedEl = null, updateHistory = true, fileType = null) {
     if (!filename) return;
 
     setActiveFile(filename);
@@ -15,14 +15,32 @@ export async function loadFile(filename, clickedEl = null, updateHistory = true)
     // Update Breadcrumbs
     updateBreadcrumbs(filename);
 
+    // Determine processing mode
+    // If fileType is provided (from sidebar), use it.
+    // Otherwise fallback to extension-based guess (for initial load/history).
+    let group = fileType;
+    if (!group) {
+        const ext = '.' + filename.split('.').pop().toLowerCase();
+        // Simple fallback map matching default server config roughly
+        if (['.png', '.jpg', '.jpeg', '.gif', '.svg', '.webp', '.bmp', '.ico'].includes(ext)) group = 'image';
+        else if (['.pdf', '.mp4', '.webm', '.ogg', '.mov', '.mp3', '.wav'].includes(ext)) group = 'media';
+        else if (['.md', '.markdown'].includes(ext)) group = 'markdown';
+        else group = 'code';
+    }
+
+    const skipFetch = (group === 'image' || group === 'media');
+
     try {
-        const encodedPath = filename.split('/').map(s => encodeURIComponent(s)).join('/');
-        const res = await fetch(`contents/${encodedPath}`);
+        let text = null;
+        if (!skipFetch) {
+            const encodedPath = filename.split('/').map(s => encodeURIComponent(s)).join('/');
+            const res = await fetch(`contents/${encodedPath}`);
 
-        if (!res.ok) throw new Error("Not found");
-        const text = await res.text();
+            if (!res.ok) throw new Error("Not found");
+            text = await res.text();
+        }
 
-        await renderContent(filename, text);
+        await renderContent(filename, text, group);
 
         if (updateHistory) {
             const newUrl = new URL(window.location);

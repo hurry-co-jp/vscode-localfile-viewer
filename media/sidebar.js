@@ -20,7 +20,9 @@ export async function loadFileList(onFileClick) {
 function buildFileTree(files) {
     const root = {};
 
-    files.forEach(path => {
+    files.forEach(file => {
+        const path = file.path;
+        const type = file.type;
         const parts = path.split('/');
         let current = root;
 
@@ -28,7 +30,7 @@ function buildFileTree(files) {
             if (!current[part]) {
                 const isFile = index === parts.length - 1;
                 current[part] = isFile
-                    ? { type: 'file', name: part, path: path }
+                    ? { type: 'file', name: part, path: path, fileType: type }
                     : { type: 'folder', name: part, children: {} };
             }
             if (current[part].type === 'folder') {
@@ -77,7 +79,7 @@ function renderTree(node, container, onFileClick) {
             li.dataset.path = entry.path;
             li.onclick = (e) => {
                 e.stopPropagation();
-                if (onFileClick) onFileClick(entry.path, li);
+                if (onFileClick) onFileClick(entry.path, li, entry.fileType);
             };
             container.appendChild(li);
         }

@@ -7,3 +7,4 @@ tsconfig.json
 publication_guide.md
 **/*.map
 *.vsix
+node_modules/**

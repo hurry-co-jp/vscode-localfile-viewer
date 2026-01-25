@@ -26,10 +26,7 @@ async function initMermaid() {
     }
 }
 
-function isYamlFile(filename) {
-    const name = (filename || '').toLowerCase();
-    return name.endsWith('.yaml') || name.endsWith('.yml');
-}
+
 
 function renderCodeBlock(text, language = '') {
     const langClass = language ? ` language-${language}` : '';
@@ -45,33 +42,76 @@ function renderCodeBlock(text, language = '') {
     } catch (e) { /* ignore */ }
 }
 
-export async function renderContent(filename, text) {
+export async function renderContent(filename, text, group) { // group: 'markdown'|'code'|'image'|'media'
     // Determine current directory for relative link resolution
     const parts = filename.split('/');
     parts.pop(); // Remove filename
     window.currentFileDir = parts.join('/');
 
-    // YAML
-    if (isYamlFile(filename)) {
+    // Determine file extension for specific tag generation (in media) or highlighting (in code)
+    const ext = filename.split('.').pop().toLowerCase();
+
+    if (group === 'image') {
         removeMarpStyle();
-        renderCodeBlock(text, 'yaml');
+        previewEl.classList.remove('marp-container');
+        previewEl.innerHTML = `<div style="display: flex; justify-content: center; align-items: center; height: 100%;">
+            <img src="/contents/${filename}" style="max-width: 100%; max-height: 100vh; object-fit: contain;">
+        </div>`;
         return;
     }
 
-    // Marp
-    if (/^---\n[\s\S]*\bmarp:\s*true\b[\s\S]*\n---/.test(text)) {
-        await renderMarp(text);
+    if (group === 'media') {
+        removeMarpStyle();
+        previewEl.classList.remove('marp-container');
+
+        if (ext === 'pdf') {
+            previewEl.innerHTML = `<embed src="/contents/${filename}" type="application/pdf" width="100%" height="100%" style="min-height: 90vh;">`;
+        } else if (['mp4', 'webm', 'ogg', 'mov'].includes(ext)) {
+            previewEl.innerHTML = `<div style="display: flex; justify-content: center; align-items: center; height: 100%;">
+                <video controls src="/contents/${filename}" style="max-width: 100%; max-height: 100vh;"></video>
+            </div>`;
+        } else if (['mp3', 'wav'].includes(ext)) {
+            previewEl.innerHTML = `<div style="display: flex; justify-content: center; align-items: center; height: 100%;">
+                <audio controls src="/contents/${filename}"></audio>
+            </div>`;
+        } else {
+            // Fallback for unknown media
+            previewEl.innerHTML = `<div style="padding: 20px;">
+                <p>Cannot preview media type: .${ext}</p>
+                <a href="/contents/${filename}" target="_blank">Download / Open in new tab</a>
+            </div>`;
+        }
         return;
     }
 
-    // Markdown
+    if (group === 'markdown') {
+        // Check for Marp
+        if (text && /^---\n[\s\S]*\bmarp:\s*true\b[\s\S]*\n---/.test(text)) {
+            await renderMarp(text);
+            return;
+        }
+
+        removeMarpStyle();
+        previewEl.classList.remove('marp-container');
+        await renderMarkdown(text || '');
+        generateToc(previewEl);
+        return;
+
+    }
+    // Default to 'code' (or fallback)
     removeMarpStyle();
-    previewEl.classList.remove('marp-container');
-    await renderMarkdown(text);
 
-    // Generate Table of Contents after rendering
-    generateToc(previewEl);
+    // Simple extension to language mapping for library
+    const langMap = {
+        'js': 'javascript', 'ts': 'typescript', 'py': 'python',
+        'html': 'html', 'css': 'css', 'json': 'json', 'sh': 'bash',
+        'rs': 'rust', 'go': 'go', 'java': 'java', 'c': 'c', 'cpp': 'cpp',
+        'yaml': 'yaml', 'yml': 'yaml'
+    };
+    renderCodeBlock(text || '', langMap[ext] || ext);
 }
+
+
 
 function removeMarpStyle() {
     const styleEl = document.getElementById('marp-style');
@@ -84,8 +124,14 @@ async function renderMarp(md) {
 
     try {
         if (!marpInstance) {
-            const { Marp } = await import('https://esm.sh/@marp-team/marp-core@4.0.0?bundle');
-            marpInstance = new Marp({
+            const mod = await import('./libs/marp.bundle.js');
+            // Handle CJS/ESM interop: might be default export or named, or default.Marp
+            const MarpClass = mod.Marp || (mod.default && mod.default.Marp) || mod.default;
+
+            if (!MarpClass || typeof MarpClass !== 'function') {
+                throw new Error("Marp class not found in bundle");
+            }
+            marpInstance = new MarpClass({
                 html: true,
                 markdown: { html: true, breaks: true }
             });

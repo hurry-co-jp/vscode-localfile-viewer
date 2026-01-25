@@ -9,9 +9,9 @@ initTheme();
 const initialFile = initRouter();
 
 // Load File List
-loadFileList((path, el) => {
+loadFileList((path, el, type) => {
     // On file click in sidebar
-    loadFile(path, el);
+    loadFile(path, el, true, type);
 }).then(() => {
     // After list loaded, load initial file if present
     if (initialFile) {

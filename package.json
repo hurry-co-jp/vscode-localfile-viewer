@@ -2,7 +2,7 @@
     "name": "vscode-localfile-viewer",
     "displayName": "Local File Viewer",
     "description": "View Markdown and local files with a rich viewer",
-    "version": "0.0.5",
+    "version": "0.0.11",
     "repository": {
         "type": "git",
         "url": "https://github.com/username/vscode-localfile-viewer"
@@ -41,17 +41,20 @@
                     "default": false,
                     "description": "Automatically open the viewer in the default browser on start."
                 },
-                "localFileViewer.allowedExtensions": {
-                    "type": "array",
-                    "default": [
-                        ".md",
-                        ".yaml",
-                        ".yml"
-                    ],
-                    "items": {
-                        "type": "string"
+                "localFileViewer.fileGroups": {
+                    "type": "object",
+                    "default": {},
+                    "description": "Add extra extensions to the default groups (markdown, image, media, code)."
+                },
+                "localFileViewer.enabledGroups": {
+                    "type": "object",
+                    "default": {
+                        "markdown": true,
+                        "image": true,
+                        "media": true,
+                        "code": true
                     },
-                    "description": "List of file extensions to show in the sidebar."
+                    "description": "Toggle visibility of file groups."
                 }
             }
         },
@@ -77,8 +80,12 @@
         "watch": "tsc -watch -p ./"
     },
     "devDependencies": {
-        "@types/vscode": "^1.80.0",
         "@types/node": "^16.11.7",
+        "@types/vscode": "^1.80.0",
         "typescript": "^5.1.3"
+    },
+    "dependencies": {
+        "@marp-team/marp-core": "^4.2.0",
+        "esbuild": "^0.27.2"
     }
 }

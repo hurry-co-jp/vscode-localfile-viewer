@@ -9,7 +9,9 @@ Markdownや様々なローカルファイルを、リッチなプレビュー画
 ## 機能
 - ローカルファイルのツリー表示機能
 - GitHubスタイルのMarkdownプレビュー
-- Mermaidダイアグラムの表示（オフライン対応）
+- **Marpスライドのプレビュー**（`marp: true` を含むMarkdownを自動検知）
+- Mermaidダイアグラムの表示
+- **完全オフライン動作**（ライブラリを同梱、外部CDN不要）
 - 「ブラウザで開く」ボタンによるデュアルスクリーン利用
 
 ## 使い方
@@ -30,4 +32,28 @@ Markdownや様々なローカルファイルを、リッチなプレビュー画
     *   選択肢: `light`, `dark`, `system`
     *   ※画面内のトグルボタンで変更した場合は、そちらの保存設定が優先されます。
 *   `localFileViewer.autoOpenBrowser`: 起動時に自動的にブラウザを開くかどうか（デフォルト: `false`）
-*   `localFileViewer.allowedExtensions`: サイドバーに表示する拡張子のリスト（デフォルト: `[".md", ".yaml", ".yml"]`）
+*   `localFileViewer.fileGroups`: デフォルトのグループ設定に追加したい拡張子を定義します。
+    *   例: 既存の `code` グループに `.rs` を追加したい場合、以下のように設定します（既存の設定をコピーする必要はありません）。
+        ```json
+        "localFileViewer.fileGroups": {
+            "code": [".rs"]
+        }
+        ```
+    *   デフォルト定義（Markdown, 画像, 動画, 主要なプログラム言語）は自動的に適用されます。
+
+    **デフォルトの対応拡張子一覧:**
+    | グループ | 拡張子 |
+    | :--- | :--- |
+    | **markdown** | `.md`, `.markdown` |
+    | **image** | `.png`, `.jpg`, `.jpeg`, `.gif`, `.svg`, `.webp`, `.bmp`, `.ico` |
+    | **media** | `.pdf`, `.mp4`, `.webm`, `.ogg`, `.mov`, `.mp3`, `.wav` |
+    | **code** | `.js`, `.ts`, `.html`, `.css`, etc. |
+
+    **各グループの表示方法:**
+    *   **markdown**: `marked.js` を使用してGitHub風のスタイルでレンダリングされます。MermaidダイアグラムやMarpスライドもこのグループで処理されます。
+    *   **image**: 画像として中央に表示されます。
+    *   **media**: 動画タグ、音声タグ、またはPDF埋め込みとして表示されます（ファイル形式に応じて自動判別）。
+    *   **code**: `highlight.js` を使用してシンタックスハイライト付きでコードブロックとして表示されます。対応していない拡張子の場合も、テキストとして表示を試みます。
+
+*   `localFileViewer.enabledGroups`: 各グループを表示するかどうかを切り替えます（`true`/`false`）。
+    *   例: 画像を表示したくない場合は `"image": false` に設定します。

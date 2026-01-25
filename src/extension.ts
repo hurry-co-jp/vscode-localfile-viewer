@@ -30,12 +30,13 @@ export function activate(context: vscode.ExtensionContext) {
             const config = vscode.workspace.getConfiguration('localFileViewer');
             const preferredPort = config.get<number>('serverPort') || 8080;
             const autoOpenBrowser = config.get<boolean>('autoOpenBrowser') || false;
-            const allowedExts = config.get<string[]>('allowedExtensions') || ['.md', '.yaml', '.yml'];
+            const fileGroups = config.get<any>('fileGroups') || {};
+            const enabledGroups = config.get<any>('enabledGroups') || {};
             const defaultTheme = config.get<string>('defaultTheme') || 'system';
 
             try {
-                // Pass allowed extensions to server
-                port = await startServer(rootPath, mediaPath, preferredPort, allowedExts);
+                // Pass configuration to server
+                port = await startServer(rootPath, mediaPath, preferredPort, fileGroups, enabledGroups);
 
                 vscode.window.showInformationMessage(`Local File Viewer running at http://localhost:${port}`, 'Open in Browser')
                     .then(selection => {
