@@ -307,6 +307,16 @@ body {
     height: auto;
 }
 
+/* Mermaid Edge Labels (Arrow Labels) */
+.mermaid .edgeLabel {
+    font-size: 10px !important;
+}
+
+/* Mermaid Node Labels */
+.mermaid .nodeLabel {
+    font-size: 12px !important;
+}
+
 /* Marp Container Overrides */
 .marp-container {
     padding: 20px;

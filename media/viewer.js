@@ -26,6 +26,25 @@ async function initMermaid() {
     }
 }
 
+// Fix foreignObject height clipping in Mermaid SVGs
+function fixMermaidForeignObjects(container) {
+    const foreignObjects = container.querySelectorAll('foreignObject');
+    foreignObjects.forEach(fo => {
+        // Get the inner div content
+        const innerDiv = fo.querySelector('div');
+        if (innerDiv) {
+            // Measure actual content height
+            const contentHeight = innerDiv.scrollHeight || innerDiv.offsetHeight;
+            const currentHeight = parseFloat(fo.getAttribute('height')) || 0;
+
+            // If content is taller than container, adjust
+            if (contentHeight > currentHeight) {
+                fo.setAttribute('height', contentHeight + 10); // Add padding
+            }
+        }
+    });
+}
+
 
 
 function renderCodeBlock(text, language = '') {
@@ -249,7 +268,11 @@ async function renderMarkdown(md) {
             try {
                 const { svg } = await mermaid.render(`svg-${graph.id}`, graph.code);
                 const element = document.getElementById(graph.id);
-                if (element) element.innerHTML = svg;
+                if (element) {
+                    element.innerHTML = svg;
+                    // Fix foreignObject height clipping issue
+                    fixMermaidForeignObjects(element);
+                }
             } catch (error) {
                 log(`Mermaid error for ${graph.id}: ${error.message}`, true);
                 const element = document.getElementById(graph.id);
