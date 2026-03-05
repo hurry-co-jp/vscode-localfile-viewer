@@ -77,6 +77,17 @@ export function activate(context: vscode.ExtensionContext) {
 
                 currentPanel.webview.html = getWebviewContent(port, defaultTheme);
 
+                // Handle messages from the webview
+                currentPanel.webview.onDidReceiveMessage(
+                    message => {
+                        if (message.command === 'openExternal') {
+                            vscode.env.openExternal(vscode.Uri.parse(message.url));
+                        }
+                    },
+                    undefined,
+                    context.subscriptions
+                );
+
                 currentPanel.onDidDispose(
                     () => {
                         currentPanel = undefined;
@@ -88,6 +99,10 @@ export function activate(context: vscode.ExtensionContext) {
             }
         })
     );
+}
+
+export function deactivate() {
+    stopServer();
 }
 
 function getWebviewContent(port: number, defaultTheme: string) {
@@ -104,10 +119,18 @@ function getWebviewContent(port: number, defaultTheme: string) {
 </head>
 <body>
     <iframe src="http://localhost:${port}/?theme=${defaultTheme}"></iframe>
+    <script>
+        const vscode = acquireVsCodeApi();
+        window.addEventListener('message', event => {
+            const message = event.data;
+            if (message && message.type === 'openInBrowser' && message.url) {
+                vscode.postMessage({
+                    command: 'openExternal',
+                    url: message.url
+                });
+            }
+        });
+    </script>
 </body>
 </html>`;
-}
-
-export function deactivate() {
-    stopServer();
 }

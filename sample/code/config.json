@@ -1,0 +1,88 @@
+{
+    "application": {
+        "name": "Local File Viewer",
+        "version": "0.1.2",
+        "description": "ローカルファイルをリッチにプレビューするVSCode拡張機能"
+    },
+    "server": {
+        "port": 8080,
+        "host": "localhost",
+        "autoOpen": false,
+        "cors": {
+            "enabled": true,
+            "origins": [
+                "http://localhost:*"
+            ]
+        }
+    },
+    "viewer": {
+        "defaultTheme": "system",
+        "supportedThemes": [
+            "light",
+            "dark",
+            "system"
+        ],
+        "fileGroups": {
+            "markdown": [
+                ".md",
+                ".markdown"
+            ],
+            "image": [
+                ".png",
+                ".jpg",
+                ".jpeg",
+                ".gif",
+                ".svg",
+                ".webp"
+            ],
+            "media": [
+                ".pdf",
+                ".mp4",
+                ".webm",
+                ".mp3",
+                ".wav"
+            ],
+            "code": [
+                ".js",
+                ".ts",
+                ".py",
+                ".sh",
+                ".json",
+                ".css",
+                ".html"
+            ]
+        },
+        "enabledGroups": {
+            "markdown": true,
+            "image": true,
+            "media": true,
+            "code": true
+        }
+    },
+    "rendering": {
+        "markdown": {
+            "engine": "marked",
+            "gfm": true,
+            "breaks": false,
+            "sanitize": false
+        },
+        "mermaid": {
+            "enabled": true,
+            "theme": "default"
+        },
+        "marp": {
+            "enabled": true,
+            "autoDetect": true
+        },
+        "codeHighlight": {
+            "engine": "highlight.js",
+            "lineNumbers": false,
+            "theme": "github-dark"
+        }
+    },
+    "features": {
+        "treeView": true,
+        "browserOpen": true,
+        "offlineMode": true
+    }
+}

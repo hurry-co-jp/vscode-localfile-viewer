@@ -52,7 +52,6 @@ export async function loadFile(filename, clickedEl = null, updateHistory = true,
         log(e.message, true);
     }
 }
-
 export function initRouter() {
     // Intercept internal links
     previewEl.addEventListener('click', (e) => {
@@ -62,12 +61,27 @@ export function initRouter() {
         const href = link.getAttribute('href');
         if (!href) return;
 
-        // Ignore external
-        if (/^(http:|https:|\/\/|#)/.test(href)) return;
+        // If it starts with #, let default behavior (anchor link) work
+        if (href.startsWith('#')) return;
+
+        e.preventDefault();
+
+        // External links (http, https, //)
+        if (/^(http:|https:|\/\/)/.test(href)) {
+            if (window.parent !== window) {
+                window.parent.postMessage({ type: 'openInBrowser', url: href }, '*');
+            } else {
+                window.open(href, '_blank');
+            }
+            return;
+        }
 
         const lower = href.toLowerCase();
         if (lower.endsWith('.md') || lower.endsWith('.yaml') || lower.endsWith('.yml')) {
-            e.preventDefault();
+            const targetPath = resolvePath(currentFilePath, href);
+            loadFile(targetPath);
+        } else {
+            // For other file types, attempt to load them via our viewer as well
             const targetPath = resolvePath(currentFilePath, href);
             loadFile(targetPath);
         }

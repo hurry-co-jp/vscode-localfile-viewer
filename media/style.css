@@ -1,3 +1,6 @@
+/* ==========================================
+   1. Variables & Core
+   ========================================== */
 :root {
     /* Dark Mode (Default) */
     --bg-color: #0d1117;
@@ -24,6 +27,11 @@
     --header-color: #24292f;
 }
 
+@page {
+    size: landscape;
+    margin: 0;
+}
+
 * {
     box-sizing: border-box;
 }
@@ -37,41 +45,14 @@ body {
     overflow: hidden;
 }
 
-/* ... skipped unchanged ... */
-
-.markdown-body h1,
-.markdown-body h2,
-.markdown-body h3 {
-    border-bottom: 1px solid var(--border-color);
-    padding-bottom: 0.3em;
-    color: var(--header-color);
-}
-
-.markdown-body pre {
-    background-color: var(--code-bg);
-    padding: 16px;
-    border-radius: 6px;
-    overflow-x: auto;
-}
-
-/* ... skipped ... */
-
-.mermaid {
-    overflow-x: auto;
-    display: block;
-    margin: 20px 0;
-    text-align: center;
-    padding-bottom: 20px;
-    /* Space for scrollbar */
-    /* Remove hardcoded background if present, relying on body bg */
-}
-
+/* ==========================================
+   2. Layout & Sidebars
+   ========================================== */
 .app-container {
     display: flex;
     height: 100%;
 }
 
-/* Sidebar */
 .sidebar {
     width: 250px;
     background-color: var(--sidebar-bg);
@@ -79,7 +60,6 @@ body {
     display: flex;
     flex-direction: column;
     flex-shrink: 0;
-    /* Prevent shrinking */
 }
 
 .sidebar-header {
@@ -93,6 +73,22 @@ body {
     color: var(--accent-color);
 }
 
+.sidebar-btn {
+    background: none;
+    border: 1px solid var(--border-color);
+    color: var(--text-color);
+    cursor: pointer;
+    padding: 4px 8px;
+    border-radius: 4px;
+    font-size: 0.85rem;
+    transition: background 0.2s, border-color 0.2s;
+}
+
+.sidebar-btn:hover {
+    background-color: var(--hover-color);
+    border-color: var(--accent-color);
+}
+
 .file-list {
     list-style: none;
     padding: 0;
@@ -102,9 +98,7 @@ body {
 
 .file-item {
     padding: 8px 10px 8px 30px;
-    /* Adjusted Indent */
     cursor: pointer;
-    /* border-bottom: 1px solid var(--border-color); Removed for tree view cleanliness */
     transition: background 0.2s;
     font-size: 0.9rem;
     color: var(--text-color);
@@ -119,20 +113,13 @@ body {
     opacity: 0.7;
 }
 
-
-
-/* Tree View Specifics */
 .tree-list {
     list-style: none;
     padding-left: 15px;
-    /* Indent for children */
     margin: 0;
     border-left: 1px solid var(--border-color);
-    /* Optional: guide line */
     margin-left: 10px;
 }
-
-
 
 .tree-folder-name {
     padding: 8px 10px;
@@ -143,20 +130,12 @@ body {
     color: var(--accent-color);
     display: flex;
     align-items: center;
-}
-
-/* Custom Arrow */
-.tree-folder-name::-webkit-details-marker {
-    display: none;
-}
-
-
-
-/* Let's use simple generic styles for summary to handle arrow if we hide default */
-.tree-folder-name {
     position: relative;
     padding-left: 30px;
-    /* Space for arrow */
+}
+
+.tree-folder-name::-webkit-details-marker {
+    display: none;
 }
 
 .tree-folder-name::before {
@@ -182,17 +161,12 @@ body {
     margin-right: 8px;
 }
 
-.file-item:hover {
-    background-color: var(--hover-color);
-}
-
 .file-item.active {
     background-color: var(--active-color);
     border-left: 3px solid var(--accent-color);
     color: #fff;
 }
 
-/* Main Content */
 .content-area {
     flex: 1;
     overflow-y: auto;
@@ -235,16 +209,80 @@ body {
     font-weight: 600;
 }
 
+/* ToC Sidebar */
+.toc-sidebar {
+    width: 250px;
+    background-color: var(--bg-color);
+    border-left: 1px solid var(--border-color);
+    padding: 20px;
+    overflow-y: auto;
+    flex-shrink: 0;
+    font-size: 0.9rem;
+    display: none;
+}
+
+.toc-sidebar.active {
+    display: block;
+}
+
+.toc-header h3 {
+    margin-top: 0;
+    font-size: 0.85rem;
+    text-transform: uppercase;
+    color: var(--text-color);
+    opacity: 0.7;
+    margin-bottom: 10px;
+}
+
+#toc-nav ul {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+#toc-nav li {
+    margin-bottom: 6px;
+}
+
+#toc-nav a {
+    text-decoration: none;
+    color: var(--text-color);
+    opacity: 0.8;
+    display: block;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    transition: opacity 0.2s;
+}
+
+#toc-nav a:hover {
+    opacity: 1;
+    color: var(--accent-color);
+}
+
+#toc-nav .toc-h2 {
+    padding-left: 15px;
+}
+
+#toc-nav .toc-h3 {
+    padding-left: 30px;
+}
+
+@media (max-width: 1000px) {
+    .toc-sidebar {
+        display: none !important;
+    }
+}
+
+/* ==========================================
+   3. Markdown & Code
+   ========================================== */
 .markdown-body {
     max-width: 95%;
-    /* Use full available width */
     margin: 0;
     line-height: 1.6;
 }
 
-/* Markdown Styles (Minimal overrides for Dark Mode) */
-/* Markdown Styles (Minimal overrides for Dark Mode) */
-/* Re-using variables defined in :root for consistency */
 .markdown-body h1,
 .markdown-body h2,
 .markdown-body h3 {
@@ -291,44 +329,25 @@ body {
     padding: 6px 13px;
 }
 
-/* Mermaid Wrapper */
 .mermaid {
     overflow-x: auto;
     display: block;
     margin: 20px 0;
     text-align: center;
     padding-bottom: 20px;
-    /* Space for scrollbar */
 }
 
 .mermaid svg {
-    /* Use Mermaid's generated width (via useMaxWidth: false), just ensure it isn't constrained */
     max-width: none !important;
     height: auto;
 }
 
-/* Mermaid Edge Labels (Arrow Labels) */
 .mermaid .edgeLabel {
     font-size: 10px !important;
 }
 
-/* Mermaid Node Labels */
 .mermaid .nodeLabel {
     font-size: 12px !important;
-}
-
-/* Marp Container Overrides */
-.marp-container {
-    padding: 20px;
-    background: gray;
-    /* Neutral background for slides */
-    min-height: 100%;
-}
-
-.marp-container>svg {
-    margin: 20px auto;
-    display: block;
-    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.5);
 }
 
 .empty-state {
@@ -337,71 +356,171 @@ body {
     margin-top: 100px;
 }
 
-/* ToC Sidebar */
-.toc-sidebar {
-    width: 250px;
-    background-color: var(--bg-color);
-    /* Match body bg or slightly different? */
-    border-left: 1px solid var(--border-color);
-    padding: 20px;
-    overflow-y: auto;
-    flex-shrink: 0;
-    font-size: 0.9rem;
-    display: none;
-    /* Hidden by default, shown via JS if headers exist? or always show? */
-}
-
-.toc-sidebar.active {
-    display: block;
-}
-
-.toc-header h3 {
-    margin-top: 0;
-    font-size: 0.85rem;
-    text-transform: uppercase;
-    color: var(--text-color);
-    opacity: 0.7;
-    margin-bottom: 10px;
-}
-
-#toc-nav ul {
-    list-style: none;
+/* ==========================================
+   4. Marp Viewer
+   ========================================== */
+.marp-container {
     padding: 0;
-    margin: 0;
-}
-
-#toc-nav li {
-    margin-bottom: 6px;
-}
-
-#toc-nav a {
-    text-decoration: none;
-    color: var(--text-color);
-    opacity: 0.8;
-    display: block;
+    background: #3a3a3a;
+    min-height: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    flex: 1;
     overflow: hidden;
-    text-overflow: ellipsis;
-    white-space: nowrap;
-    transition: opacity 0.2s;
 }
 
-#toc-nav a:hover {
-    opacity: 1;
-    color: var(--accent-color);
+#marp-shadow-host {
+    aspect-ratio: 16 / 9;
+    width: 100%;
+    max-height: calc(100% - 60px);
+    overflow: hidden;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.6);
 }
 
-/* Indent for H2/H3 */
-#toc-nav .toc-h2 {
-    padding-left: 15px;
+#marp-shadow-host:fullscreen {
+    background: #000;
+    width: 100vw;
+    height: 100vh;
+    max-height: none;
+    display: flex;
+    align-items: center;
+    justify-content: center;
 }
 
-#toc-nav .toc-h3 {
-    padding-left: 30px;
+#marp-nav {
+    display: grid;
+    grid-template-columns: 1fr auto 1fr;
+    align-items: center;
+    padding: 8px 20px;
+    background: rgba(0, 0, 0, 0.5);
+    width: 100%;
+    flex-shrink: 0;
 }
 
-/* Responsive: Hide ToC on smaller screens */
-@media (max-width: 1000px) {
-    .toc-sidebar {
+.marp-nav-section {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.marp-nav-section.center {
+    justify-content: center;
+}
+
+.marp-nav-section.right {
+    justify-content: flex-end;
+}
+
+.marp-nav-btn {
+    background: none;
+    border: 1px solid rgba(255, 255, 255, 0.4);
+    color: #fff;
+    border-radius: 6px;
+    padding: 5px 16px;
+    font-size: 1rem;
+    cursor: pointer;
+    transition: background 0.2s;
+    min-width: 48px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.marp-nav-btn:hover {
+    background: rgba(255, 255, 255, 0.15);
+}
+
+#marp-counter {
+    color: #fff;
+    font-size: 0.9rem;
+    min-width: 80px;
+    text-align: center;
+    font-family: 'Inter', system-ui, sans-serif;
+}
+
+/* ==========================================
+   5. Marp Print
+   ========================================== */
+@media print {
+
+    html,
+    body {
+        margin: 0 !important;
+        padding: 0 !important;
+        background: #fff !important;
+        color: #000 !important;
+        width: 100vw !important;
+        height: 100vh !important;
+        overflow: visible !important;
+        -webkit-print-color-adjust: exact !important;
+        print-color-adjust: exact !important;
+    }
+
+    .sidebar,
+    .toc-sidebar,
+    #marp-nav,
+    #breadcrumbs,
+    #debug-container,
+    .sidebar-header,
+    .sidebar-btn {
         display: none !important;
+    }
+
+    .content-area {
+        padding: 0 !important;
+        margin: 0 !important;
+        overflow: visible !important;
+        display: block !important;
+    }
+
+    #preview {
+        padding: 0 !important;
+        margin: 0 !important;
+        max-width: none !important;
+        background: none !important;
+    }
+
+    #marp-shadow-host {
+        display: none !important;
+    }
+
+    #marp-print-container {
+        display: block !important;
+        position: absolute !important;
+        top: 0 !important;
+        left: 0 !important;
+        width: 100vw !important;
+        height: 100vh !important;
+        margin: 0 !important;
+        padding: 0 !important;
+        z-index: 9999 !important;
+    }
+
+    .marp-print-slide {
+        width: 100vw;
+        height: 100vh;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background: #fff;
+        margin: 0 !important;
+        padding: 0 !important;
+        break-inside: avoid;
+        break-before: avoid;
+        page-break-before: avoid;
+    }
+
+    .marp-print-slide:not(:last-child) {
+        break-after: page;
+        page-break-after: always;
+    }
+
+    .marp-print-slide .marpit {
+        width: 1280px;
+        height: 720px;
+        transform-origin: center center;
+        transform: scale(calc(100vw / 1280));
     }
 }

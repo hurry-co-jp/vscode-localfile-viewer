@@ -48,3 +48,46 @@ export function generateToc(previewEl) {
 
     tocNav.appendChild(ul);
 }
+
+export function generateMarpToc(slides, onSelect) {
+    const tocNav = document.getElementById('toc-nav');
+    const sidebar = document.querySelector('.toc-sidebar');
+
+    if (!tocNav || !sidebar) return;
+
+    // Clear previous ToC
+    tocNav.innerHTML = '';
+
+    if (slides.length === 0) {
+        sidebar.classList.remove('active');
+        return;
+    }
+
+    sidebar.classList.add('active');
+
+    const ul = document.createElement('ul');
+
+    slides.forEach((slide, index) => {
+        // Find the first heading (h1, h2, or h3) in the slide
+        const header = slide.querySelector('h1, h2, h3');
+        const pageNum = index + 1;
+        const title = header ? header.textContent : `Slide ${pageNum}`;
+
+        const li = document.createElement('li');
+        const a = document.createElement('a');
+
+        a.textContent = `${pageNum}. ${title}`;
+        a.href = '#';
+        a.className = `toc-${header ? header.tagName.toLowerCase() : 'h1'}`;
+
+        a.onclick = (e) => {
+            e.preventDefault();
+            onSelect(index);
+        };
+
+        li.appendChild(a);
+        ul.appendChild(li);
+    });
+
+    tocNav.appendChild(ul);
+}
