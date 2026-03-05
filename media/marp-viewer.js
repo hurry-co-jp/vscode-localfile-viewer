@@ -244,6 +244,7 @@ export async function renderMarp(md, filename = 'slide.md') {
         log('Marp slide viewer ready.');
     } catch (e) {
         log(`Marp render error: ${e.message}`, true);
+        console.error("Marp Detailed Error:", e);
         previewEl.innerHTML = `<div class="error-box">Marp Error: ${e.message}</div>`;
     }
 }
