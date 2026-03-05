@@ -6,9 +6,9 @@ import { renderMarkdown } from './markdown-renderer.js';
 const previewEl = document.getElementById('preview');
 
 function renderCodeBlock(text, language = '') {
-    const langClass = language ? ` language-${language}` : '';
+    const langClass = language ? ` language - ${language} ` : '';
     previewEl.classList.remove('marp-container');
-    previewEl.innerHTML = `<pre><code class="${langClass.trim()}">${escapeHtml(text)}</code></pre>`;
+    previewEl.innerHTML = `< pre > <code class="${langClass.trim()}">${escapeHtml(text)}</code></pre > `;
 
     try {
         const codeEl = previewEl.querySelector('pre code');
@@ -31,34 +31,35 @@ export async function renderContent(filename, text, group) {
     const ext = filename.split('.').pop().toLowerCase();
 
     if (group === 'image') {
-        previewEl.innerHTML = `<div style="display: flex; justify-content: center; align-items: center; height: 100%;">
-            <img src="/contents/${filename}" style="max-width: 100%; max-height: 100vh; object-fit: contain;">
-        </div>`;
+        previewEl.innerHTML = `< div style = "display: flex; justify-content: center; align-items: center; height: 100%;" >
+    <img src="/contents/${filename}" style="max-width: 100%; max-height: 100vh; object-fit: contain;">
+    </div>`;
         return;
     }
 
     if (group === 'media') {
         if (ext === 'pdf') {
-            previewEl.innerHTML = `<embed src="/contents/${filename}" type="application/pdf" width="100%" height="100%" style="min-height: 90vh;">`;
+            previewEl.innerHTML = `< embed src = "/contents/${filename}" type = "application/pdf" width = "100%" height = "100%" style = "min-height: 90vh;" > `;
         } else if (['mp4', 'webm', 'ogg', 'mov'].includes(ext)) {
-            previewEl.innerHTML = `<div style="display: flex; justify-content: center; align-items: center; height: 100%;">
-                <video controls src="/contents/${filename}" style="max-width: 100%; max-height: 100vh;"></video>
-            </div>`;
+            previewEl.innerHTML = `< div style = "display: flex; justify-content: center; align-items: center; height: 100%;" >
+    <video controls src="/contents/${filename}" style="max-width: 100%; max-height: 100vh;"></video>
+            </div > `;
         } else if (['mp3', 'wav'].includes(ext)) {
-            previewEl.innerHTML = `<div style="display: flex; justify-content: center; align-items: center; height: 100%;">
-                <audio controls src="/contents/${filename}"></audio>
-            </div>`;
+            previewEl.innerHTML = `< div style = "display: flex; justify-content: center; align-items: center; height: 100%;" >
+    <audio controls src="/contents/${filename}"></audio>
+            </div > `;
         } else {
-            previewEl.innerHTML = `<div style="padding: 20px;">
+            previewEl.innerHTML = `< div style = "padding: 20px;" >
                 <p>Cannot preview media type: .${ext}</p>
                 <a href="/contents/${filename}" target="_blank">Download / Open in new tab</a>
-            </div>`;
+            </div > `;
         }
         return;
     }
 
     if (group === 'markdown') {
-        if (text && /^---\n[\s\S]*\bmarp:\s*true\b[\s\S]*\n---/.test(text)) {
+        const marpRegex = /^---\r?\n[\s\S]*?\bmarp:\s*true\b[\s\S]*?\r?\n---/i;
+        if (text && marpRegex.test(text)) {
             await renderMarp(text, filename);
             return;
         }
