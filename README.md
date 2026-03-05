@@ -7,12 +7,21 @@ Markdownや様々なローカルファイルを、リッチなプレビュー画
 2.  **ブラウザ互換**: VSCode内だけでなく、Chromeなどのブラウザでも全く同じ画面でファイルを閲覧できます。
 
 ## 機能
-- ローカルファイルのツリー表示機能
-- GitHubスタイルのMarkdownプレビュー
-- **Marpスライドのプレビュー**（`marp: true` を含むMarkdownを自動検知）
-- Mermaidダイアグラムの表示
-- **完全オフライン動作**（ライブラリを同梱、外部CDN不要）
-- 「ブラウザで開く」ボタンによるデュアルスクリーン利用
+- **ローカルファイルのツリー表示機能**
+- **GitHubスタイルのMarkdownプレビュー**
+- **Marpスライドプレビュー**（`marp: true` を自動検知）
+- **Mermaidダイアグラムの表示**
+
+## スクリーンショット
+
+### VSCode プレビュー
+<a href="./images/vscode_preview.png"><img src="./images/vscode_preview.png" width="100%" alt="VSCode Preview"></a>
+
+### ブラウザ プレビュー
+<a href="./images/browser_preview.png"><img src="./images/browser_preview.png" width="100%" alt="Browser Preview"></a>
+
+### Marp スライド表示
+<a href="./images/marp_preview.png"><img src="./images/marp_preview.png" width="100%" alt="Marp Preview"></a>
 
 ## インストール
 
