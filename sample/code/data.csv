@@ -1,0 +1,13 @@
+filename,group,size_bytes,extension,last_modified
+README.md,markdown,1024,.md,2026-01-15 10:30:00
+architecture.md,markdown,3456,.md,2026-01-20 14:22:10
+slide-deck.md,markdown,2048,.md,2026-02-01 09:15:30
+app.js,code,5120,.js,2026-01-18 16:45:00
+server.py,code,3200,.py,2026-02-10 11:00:00
+deploy.sh,code,1800,.sh,2026-01-25 08:30:00
+config.json,code,960,.json,2026-02-05 13:20:00
+logo.svg,image,4096,.svg,2026-01-10 12:00:00
+screenshot.png,image,15360,.png,2026-01-22 17:50:00
+photo.jpg,image,25600,.jpg,2026-02-08 14:30:00
+demo.mp4,media,1048576,.mp4,2026-01-30 10:00:00
+manual.pdf,media,524288,.pdf,2026-02-12 09:45:00

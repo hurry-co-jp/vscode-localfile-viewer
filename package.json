@@ -2,7 +2,7 @@
     "name": "vscode-localfile-viewer",
     "displayName": "Local File Viewer",
     "description": "View Markdown and local files with a rich viewer",
-    "version": "0.1.2",
+    "version": "0.2.0",
     "repository": {
         "type": "git",
         "url": "https://github.com/username/vscode-localfile-viewer"
@@ -13,9 +13,7 @@
     "categories": [
         "Other"
     ],
-    "activationEvents": [
-        "onCommand:vscode-localfile-viewer.open"
-    ],
+    "activationEvents": [],
     "main": "./out/extension.js",
     "contributes": {
         "configuration": {
@@ -61,7 +59,7 @@
         "commands": [
             {
                 "command": "vscode-localfile-viewer.open",
-                "title": "Open Use Local File Viewer"
+                "title": "Open with Local File Viewer"
             }
         ],
         "menus": {

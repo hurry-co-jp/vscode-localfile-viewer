@@ -23,8 +23,11 @@
         <aside class="sidebar">
             <div class="sidebar-header" style="display: flex; justify-content: space-between; align-items: center;">
                 <h2>Explorer</h2>
-                <button id="theme-toggle"
-                    style="background:none; border:1px solid var(--border-color); color:var(--text-color); cursor:pointer; padding:4px 8px; border-radius:4px;">Draft/Light</button>
+                <div style="display: flex; gap: 4px; align-items: center;">
+                    <button id="open-in-browser" class="sidebar-btn" style="display:none;"
+                        title="Open in Browser">🌐</button>
+                    <button id="theme-toggle" class="sidebar-btn" title="Toggle Theme">Draft/Light</button>
+                </div>
             </div>
             <ul id="file-list" class="file-list">
                 <!-- File items injected here -->

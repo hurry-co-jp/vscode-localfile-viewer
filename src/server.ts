@@ -2,10 +2,12 @@ import * as http from 'http';
 import * as fs from 'fs';
 import * as path from 'path';
 import { AddressInfo } from 'net';
+import { Socket } from 'net';
 
 let server: http.Server | null = null;
 let currentContentRoot: string = '';
 let mediaRoot: string = '';
+let activeSockets: Set<Socket> = new Set();
 
 // Hardcoded safety excludes
 const excludePatterns: string[] = ['node_modules', '.git', '.DS_Store'];
@@ -55,6 +57,7 @@ export function startServer(contentPath: string, mediaPath: string, port: number
             return;
         }
 
+
         const tryPort = (currentPort: number) => {
             if (server) {
                 // If we are here, it means we decided to restart (port changed)
@@ -67,6 +70,13 @@ export function startServer(contentPath: string, mediaPath: string, port: number
             // excludePatterns is constant
             fileGroups = mergedGroups; // Use merged
             enabledGroups = enabled;
+
+            tempServer.on('connection', (socket) => {
+                activeSockets.add(socket);
+                socket.on('close', () => {
+                    activeSockets.delete(socket);
+                });
+            });
 
             tempServer.on('error', (err: any) => {
                 if (err.code === 'EADDRINUSE') {
@@ -103,6 +113,10 @@ export function startServer(contentPath: string, mediaPath: string, port: number
         };
 
         if (server) {
+            for (const socket of activeSockets) {
+                socket.destroy();
+            }
+            activeSockets.clear();
             server.close(() => {
                 server = null;
                 tryPort(port);
@@ -115,6 +129,10 @@ export function startServer(contentPath: string, mediaPath: string, port: number
 
 export function stopServer() {
     if (server) {
+        for (const socket of activeSockets) {
+            socket.destroy();
+        }
+        activeSockets.clear();
         server.close();
         server = null;
         currentRunningPort = -1;
@@ -245,7 +263,9 @@ async function scanFiles(dir: string, baseDir: string = dir): Promise<FileEntry[
             } else {
                 // Check if file is in an enabled group
                 const group = getFileGroup(entry.name);
-                if (group && enabledGroups[group]) {
+                // If group is not explicitly disabled, show it.
+                // This handles cases where user defined groups or unknown file types (defaulted to 'code').
+                if (group && enabledGroups[group] !== false) {
                     // It is a file
                     let rel = path.relative(baseDir, fullPath).replace(/\\/g, '/');
                     results.push({
@@ -269,7 +289,8 @@ function getFileGroup(filename: string): string | null {
             return group;
         }
     }
-    return null;
+    // Default to 'code' group for unmatched extensions (renders as plain text)
+    return 'code';
 }
 
 function isExcluded(filename: string): boolean {
